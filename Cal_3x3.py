@@ -1,131 +1,139 @@
-from typing import Tuple, List
-
-# Constantes para os caracteres de borda
-BORDA_SUPERIOR = "╔════════════════════════════════════════╗"
-BORDA_INFERIOR = "╚════════════════════════════════════════╝"
+# Constantes para bordas
+BORDA_SUPERIOR = "╔════════════════════════════════════════════════════════╗"
+BORDA_INFERIOR = "╚════════════════════════════════════════════════════════╝"
 BORDA_LATERAL = "║"
-BORDA_DIVISORIA = "╠════════════════════════════════════════╣"
-BORDA = "════════════════════════════════════════"
+BORDA_DIVISORIA = "╠════════════════════════════════════════════════════════╣"
 
-def calcular_determinante_3x3(matriz: List[List[float]]) -> float:
-    """Calcula o determinante de uma matriz 3x3."""
-    return (matriz[0][0] * matriz[1][1] * matriz[2][2] +
-            matriz[0][1] * matriz[1][2] * matriz[2][0] +
-            matriz[0][2] * matriz[1][0] * matriz[2][1] -
-            matriz[0][2] * matriz[1][1] * matriz[2][0] -
-            matriz[0][0] * matriz[1][2] * matriz[2][1] -
-            matriz[0][1] * matriz[1][0] * matriz[2][2])
-
-def verificar_colinearidade(p1: Tuple[float, float], 
-                          p2: Tuple[float, float], 
-                          p3: Tuple[float, float]) -> bool:
-    """Verifica se três pontos são colineares."""
-    matriz = [
-        [p1[0], p1[1], 1],
-        [p2[0], p2[1], 1],
-        [p3[0], p3[1], 1]
-    ]
-    return calcular_determinante_3x3(matriz) == 0
-
-def calcular_area_triangulo(p1: Tuple[float, float], 
-                          p2: Tuple[float, float], 
-                          p3: Tuple[float, float]) -> float:
-    """Calcula a área de um triângulo formado por três pontos."""
-    if verificar_colinearidade(p1, p2, p3):
-        return 0.0
-    
-    det = calcular_determinante_3x3([
-        [p1[0], p1[1], 1],
-        [p2[0], p2[1], 1],
-        [p3[0], p3[1], 1]
-    ])
-    return abs(det) / 2
-
-def obter_ponto_do_usuario(numero_ponto: int) -> Tuple[float, float]:
-    """Solicita ao usuário as coordenadas de um ponto."""
-    while True:
-        try:
-            print(BORDA_SUPERIOR)
-            print(f"{BORDA_LATERAL} Digite as coordenadas do ponto {numero_ponto}{' ':>7}{BORDA_LATERAL}")
-            print(BORDA_DIVISORIA)
-            x = float(input(f"{' ':>12} Coordenada x: "))
-            y = float(input(f"{' ':>12} Coordenada y: "))
-            print(BORDA_INFERIOR)
-            return (x, y)
-            
-        except ValueError:
-            print(BORDA_INFERIOR)
-            print("\n" + BORDA_SUPERIOR)
-            print(f"{BORDA_LATERAL}ERRO: Digite valores numéricos válidos!{' ':>1}{BORDA_LATERAL}")
-            print(BORDA_INFERIOR)
-
-def exibir_resultados(p1: Tuple[float, float], 
-                     p2: Tuple[float, float], 
-                     p3: Tuple[float, float]):
-    """Exibe os resultados formatados com bordas."""
+def print_com_borda(texto: str):
     print(BORDA_SUPERIOR)
-    print(f"{BORDA_LATERAL}{' RESULTADOS DO CÁLCULO ':^40}{BORDA_LATERAL}")
+    for linha in texto.split("\n"):
+        print(f"{BORDA_LATERAL} {linha:<54} {BORDA_LATERAL}")
     print(BORDA_INFERIOR)
-    print(f"{' ':>9} Ponto 1: ({p1[0]:.2f}, {p1[1]:.2f})")
-    print(f"{' ':>9} Ponto 2: ({p2[0]:.2f}, {p2[1]:.2f})")
-    print(f"{' ':>9} Ponto 3: ({p3[0]:.2f}, {p3[1]:.2f})")
-    print(BORDA_SUPERIOR)
+
+def det2x2(matriz2):
+    print_com_borda("Matriz escolhida:\n" + f"{matriz2[0]}\n{matriz2[1]}")
+    print_com_borda("Passo a passo demonstrado\nMultiplicações")
     
-    area = calcular_area_triangulo(p1, p2, p3)
-    if area == 0:
-        print(f"{BORDA_LATERAL}{' PONTOS COLINEARES- NÃO FORMAM TRIÂNGULO':^38}{BORDA_LATERAL}")
+    mul21 = matriz2[0][0] * matriz2[1][1]
+    mul22 = matriz2[0][1] * matriz2[1][0]
+    
+    print_com_borda(f"Multiplicando {matriz2[0][0]} por {matriz2[1][1]}: {mul21}\n"
+                    f"Multiplicando {matriz2[0][1]} por {matriz2[1][0]}: {mul22}")
+    
+    det2 = mul21 - mul22
+    print_com_borda(f"Subtraindo {mul21} por {mul22}\nDeterminante: {det2}")
+    return det2
+
+def det3x3(matriz3, ordem=None):
+    if ordem:
+        print_com_borda(f"Calculando o {ordem}º Determinante 3x3")
     else:
-        print(f"{'':3} Área do triângulo: {area:.2f} unidades²")
-    print(BORDA_INFERIOR)
-
-def menu_principal() -> str:
-    """Exibe o menu principal com bordas decorativas."""
-    print("\n" + BORDA_SUPERIOR)
-    print(f"{BORDA_LATERAL}{' CÁLCULO DE ÁREA DE TRIÂNGULO ':^40}{BORDA_LATERAL}")
-    print(BORDA_DIVISORIA)
-    print(f"{BORDA_LATERAL} 1 - Usar pontos fixos de exemplo{'':>7}{BORDA_LATERAL}")
-    print(f"{BORDA_LATERAL} 2 - Inserir pontos manualmente{' ':>9}{BORDA_LATERAL}")
-    print(f"{BORDA_LATERAL} 3 - Sair do programa{' ':>19}{BORDA_LATERAL}")
-    print(BORDA_INFERIOR)
-    print("\n" + BORDA_SUPERIOR)
-    print(f"{BORDA_LATERAL} {' ':8}Digite sua opção (1-3){' ':9}{BORDA_LATERAL}")
-    print(BORDA_INFERIOR)
-    opcao = input().strip()
-    return opcao
+        print_com_borda("Utilizaremos o método de Sarrus")
     
+    print_com_borda(f"{matriz3[0]}\n{matriz3[1]}\n{matriz3[2]}")
+    
+    mul31 = matriz3[0][0] * matriz3[1][1] * matriz3[2][2]
+    mul32 = matriz3[0][1] * matriz3[1][2] * matriz3[2][0]
+    mul33 = matriz3[0][2] * matriz3[1][0] * matriz3[2][1]
+
+    mul34 = matriz3[0][2] * matriz3[1][1] * matriz3[2][0]
+    mul35 = matriz3[0][0] * matriz3[1][2] * matriz3[2][1]
+    mul36 = matriz3[0][1] * matriz3[1][0] * matriz3[2][2]
+    
+    print_com_borda("Multiplicações\n"
+        f"{matriz3[0][0]} * {matriz3[1][1]} * {matriz3[2][2]} = {mul31}\n"
+        f"{matriz3[0][1]} * {matriz3[1][2]} * {matriz3[2][0]} = {mul32}\n"
+        f"{matriz3[0][2]} * {matriz3[1][0]} * {matriz3[2][1]} = {mul33}\n"
+        f"{matriz3[0][2]} * {matriz3[1][1]} * {matriz3[2][0]} = {mul34}\n"
+        f"{matriz3[0][0]} * {matriz3[1][2]} * {matriz3[2][1]} = {mul35}\n"
+        f"{matriz3[0][1]} * {matriz3[1][0]} * {matriz3[2][2]} = {mul36}")
+    
+    soma31 = mul31 + mul32 + mul33
+    soma32 = mul34 + mul35 + mul36
+    
+    print_com_borda(f"Somas:\nDireta: {soma31}\nInversa: {soma32}")
+    
+    det3 = soma31 - soma32
+    print_com_borda(f"Determinante: {det3}")
+    return det3
+
+def calculaCofator(elemento, numLinha, numColuna, ordem=None):
+    somaC = numLinha + numColuna
+    cofator = ((-1)**somaC) * elemento
+    if ordem:
+        print_com_borda(f"Calculando o {ordem}º Cofator")
+    print_com_borda(f"Obtendo o cofator\n"
+                    f"Soma dos índices: {somaC}\n"
+                    f"(-1)^{somaC} * {elemento} = {cofator}")
+    return cofator
+
+def det4x4(matriz4):
+    print_com_borda("Matriz escolhida:\n" +
+        "\n".join([str(linha) for linha in matriz4]))
+    print_com_borda("Utilizaremos o Teorema de Laplace\nBase: Linha 1")
+    
+    def submatriz(i):
+        return [
+            [matriz4[r][c] for c in range(4) if c != i]
+            for r in range(1, 4)
+        ]
+
+    dets = []
+    cofatores = []
+    for i in range(4):
+        m3 = submatriz(i)
+        det_i = det3x3(m3, i + 1)  # Numeração dos determinantes
+        cof = calculaCofator(det_i, 1, i + 1, i + 1)  # Numeração dos cofatores
+        produto = matriz4[0][i] * cof
+        dets.append(produto)
+        cofatores.append((matriz4[0][i], cof))
+
+    resultado = sum(dets)
+    mults = "\n".join([f"{a} * {b} = {a * b}" for a, b in cofatores])
+    print_com_borda("Multiplicações dos cofatores:\n" + mults)
+    print_com_borda(f"Determinante final: {resultado}")
+
+def menu():
+    print_com_borda("Escolha o tipo de matriz:\n"
+                    "4 - Matriz 4x4\n"
+                    "3 - Matriz 3x3\n"
+                    "2 - Matriz 2x2\n"
+                    "1 - Sair")
+
+def montarMatriz(numero):
+    matriz = []
+    for i in range(numero):
+        linha = []
+        for j in range(numero):
+            while True:
+                try:
+                    valor = int(input(f"\nDigite o valor para ({i+1},{j+1}): "))
+                    break
+                except ValueError:
+                    print("\nEntrada inválida! Por favor, digite um número inteiro.")
+            linha.append(valor)
+        matriz.append(linha)
+    return matriz
+
+
 def main():
-    """Função principal do programa."""
-    while True:
-        opcao = menu_principal()
-        
-        if opcao == '1':
-            p1, p2, p3 = (2, 3), (5, 11), (12, 8)
-        elif opcao == '2':
-            p1 = obter_ponto_do_usuario(1)
-            p2 = obter_ponto_do_usuario(2)
-            p3 = obter_ponto_do_usuario(3)
-        elif opcao == '3':
-            print(BORDA_SUPERIOR)
-            print(f"{BORDA_LATERAL}{' PROGRAMA ENCERRADO. ATÉ LOGO! ':^40}{BORDA_LATERAL}")
-            print(BORDA_INFERIOR)
-            break
+    print_com_borda("Bem-vindo(a) ao Tutor de Determinantes!")
+    menu()
+    tipo = input("Seleção: ").strip()
+
+    while tipo != "1":
+        if tipo == "4":
+            det4x4(montarMatriz(4))
+        elif tipo == "3":
+            det3x3(montarMatriz(3))
+        elif tipo == "2":
+            det2x2(montarMatriz(2))
         else:
-            print(BORDA_SUPERIOR)
-            print(f"{BORDA_LATERAL}{' OPÇÃO INVÁLIDA! DIGITE 1, 2 OU 3. ':^40}{BORDA_LATERAL}")
-            print(BORDA_INFERIOR)
-            continue
-        
-        exibir_resultados(p1, p2, p3)
-        
-        if opcao != '3':
-            print(BORDA_SUPERIOR)
-            print(f"{BORDA_LATERAL} Deseja realizar outro cálculo? (s/n) {' ':>2}{BORDA_LATERAL}")
-            print(BORDA_INFERIOR + "\n")
-            if input(f"{' ':>15}Resposta: ").lower() != 's':
-                print("\n" + BORDA_SUPERIOR)
-                print(f"{BORDA_LATERAL}{' PROGRAMA ENCERRADO. ATÉ LOGO! ':^40}{BORDA_LATERAL}")
-                print(BORDA_INFERIOR)
-                break
+            print_com_borda("Seleção inválida. Tente novamente.")
+        menu()
+        tipo = input("Nova seleção: ").strip()
+
+    print_com_borda("Programa encerrado. Até logo!")
 
 if __name__ == "__main__":
     main()
